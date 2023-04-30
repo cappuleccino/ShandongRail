@@ -1,0 +1,190 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+    <title>山东高速铁路GIS系统</title>
+    <style>
+        html,
+        body,
+        #viewDiv {
+            padding: 0;
+            margin: 0;
+            height: 94.5%;
+            width: 100%;
+        }
+
+        .bannerDiv {
+            background-color: #0072c6; /* 设置背景颜色为蓝色 */
+            color: #fff; /* 设置文字颜色为白色 */
+            font-family: SimSun, sans-serif; /* 设置字体为宋体 */
+            font-size: 24px; /* 设置字号为24px */
+            font-weight: bold; /* 设置字体加粗 */
+            padding: 20px; /* 设置内边距为20px */
+        }
+
+        .navigationDiv {
+            width: 100%;
+            height: 30px;
+        }
+
+        .nav ul {
+            list-style: none;
+        }
+
+        .nav li {
+            width: 20%;
+            height: 50%;
+            float: left;
+        }
+
+            .nav li a {
+                display: block; /*块状显示*/
+                text-align: center; /*文本对齐*/
+                line-height: 100%; /*行高*/
+                font-family: SimSun, sans-serif; /* 设置字体为宋体 */
+                font-size: 17px; /* 设置字号为17px */
+            }
+    </style>
+    <link rel="stylesheet" href="https://js.arcgis.com/4.23/esri/themes/light/main.css">
+    <script src="https://js.arcgis.com/4.23/"></script>
+    <script>
+        require([
+            "esri/views/MapView",
+            "esri/WebMap",
+            "esri/widgets/DistanceMeasurement2D",
+            "esri/widgets/BasemapToggle",
+            "esri/widgets/BasemapGallery",
+            "esri/widgets/Track",
+            "esri/Graphic",
+            "esri/widgets/Home",
+            "esri/widgets/Compass",
+            "esri/widgets/ScaleBar",
+            "esri/widgets/CoordinateConversion"
+        ], function (
+            MapView,
+            WebMap,
+            DistanceMeasurement2D,
+            BasemapToggle,
+            BasemapGallery,
+            Track,
+            Graphic,
+            Home,
+            Compass,
+            ScaleBar,
+            CoordinateConversion
+        ) {
+            //显示web地图
+            var webmap = new WebMap({
+                portalItem: {//autocasts as new PortalItem()
+                    id: "f66b79d535184093951b39895b0d1bc3"
+                }
+            });
+            //加载视图
+            var view = new MapView({
+                map: webmap,
+                container: "viewDiv"
+            });
+
+            //更改地图底图
+            var basemapToggle = new BasemapToggle({
+                view: view,
+                nextBasemap: "arcgis-imagery"
+            });
+            //将微键添加到视图
+            view.ui.add(basemapToggle, "bottom-right");
+
+            //创建底图库并设置query
+            //var basemapGallery = new BasemapGallery({
+            //    view: view,
+            //    source: {
+            //        query: {
+            //            title: '"World Basemaps for Developers" AND owner:esri'
+            //        }
+            //    }
+            //});
+            //view.ui.add(basemapGallery, "bottom-right"); 
+
+            //距离量算
+            var Distance2D = new DistanceMeasurement2D({
+                view: view,
+                lable: "距离量算",
+                unit: "meters"
+            });
+            view.ui.add(Distance2D, "top-right");
+
+            //位置跟踪
+            var track = new Track({
+                view: view,
+                graphic: new Graphic({
+                    symbol: {
+                        type: "simple-marker",
+                        size: "12px",
+                        color: "green",
+                        outline: {
+                            color: "#efefef",
+                            width: "1.5px"
+                        }
+                    }
+                }),
+                useHeadingEnabled: false
+            });
+            view.ui.add(track, "top-left");
+
+            //添加Home微键
+            Showhome();
+
+            function Showhome() {
+                var home = new Home({
+                    view: view,
+                });
+                view.ui.add(home, "top-left");
+            };
+
+            //指南针
+            ShowCompass();
+
+            function ShowCompass() {
+                var compass = new Compass({
+                    view: view
+                });
+                view.ui.add(compass, "top-left");
+            };
+
+            //比例尺
+            ShowScaleBar();
+
+            function ShowScaleBar() {
+                var scaleBar = new ScaleBar({
+                    style: "ruler",//line
+                    view: view,
+                    unit: "dual"//metric
+                });
+                view.ui.add(scaleBar, "bottom-left")
+            };
+
+            //经纬度
+            var ccwidget = new CoordinateConversion({
+                view: view
+            })
+            view.ui.add(ccwidget, "bottom-left");
+        });
+    </script>
+</head>
+<body>
+    <div class="bannerDiv">山东域内高铁信息GIS系统</div>
+    <div class="navigationDiv">
+        <div class="nav">
+            <ul>
+                <li><a href="Home.html">首页</a></li>
+                <li><a href="Map.html">地图浏览</a></li>
+                <li><a href="Search.html">地图查询</a></li>
+                <li><a href="Distance.html">距离量测</a></li>
+                <li><a href="Direction.html">方向路径</a></li>
+            </ul>
+        </div>
+    </div>
+    <div id="viewDiv"></div>
+</body>
+
+</html>

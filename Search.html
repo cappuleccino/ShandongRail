@@ -1,0 +1,225 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+    <title>山东高速铁路GIS系统</title>
+    <style>
+        html,
+        body,
+        #viewDiv {
+            padding: 0;
+            margin: 0;
+            height: 96.9%;
+            width: 100%;
+        }
+
+        .bannerDiv {
+            background-color: #0072c6; /* 设置背景颜色为蓝色 */
+            color: #fff; /* 设置文字颜色为白色 */
+            font-family: SimSun, sans-serif; /* 设置字体为宋体 */
+            font-size: 24px; /* 设置字号为24px */
+            font-weight: bold; /* 设置字体加粗 */
+            padding: 20px; /* 设置内边距为20px */
+        }
+
+        .navigationDiv {
+            width: 100%;
+            height: 50px;
+        }
+
+        .nav ul {
+            list-style: none;
+        }
+
+        .nav li {
+            width: 20%;
+            height: 100%;
+            float: left;
+        }
+
+            .nav li a {
+                display: block; /*块状显示*/
+                text-align: center; /*文本对齐*/
+                line-height: 100%; /*行高*/
+                font-family: SimSun, sans-serif; /* 设置字体为宋体 */
+                font-size: 17px; /* 设置字号为17px */
+            }
+    </style>
+    <link rel="stylesheet" href="https://js.arcgis.com/4.23/esri/themes/light/main.css">
+    <script src="https://js.arcgis.com/4.23/"></script>
+    <script>
+        require([
+            "esri/views/MapView",
+            "esri/WebMap",
+            "esri/widgets/BasemapToggle",
+            "esri/widgets/Track",
+            "esri/Graphic",
+            "esri/widgets/Home",
+            "esri/widgets/Compass",
+            "esri/widgets/ScaleBar",
+            "esri/widgets/CoordinateConversion",
+            "esri/layers/FeatureLayer",
+            "esri/widgets/Search"
+        ], function (
+            MapView,
+            WebMap,
+            BasemapToggle,
+            Track,
+            Graphic,
+            Home,
+            Compass,
+            ScaleBar,
+            CoordinateConversion,
+            FeatureLayer,
+            Search
+        ) {
+            //显示web地图
+            var webmap = new WebMap({
+                portalItem: {//autocasts as new PortalItem()
+                    id: "f66b79d535184093951b39895b0d1bc3"
+                }
+            });
+            //加载视图
+            var view = new MapView({
+                map: webmap,
+                container: "viewDiv"
+            });
+
+            //更改地图底图
+            var basemapToggle = new BasemapToggle({
+                view: view,
+                nextBasemap: "arcgis-imagery"
+            });
+            //将微键添加到视图
+            view.ui.add(basemapToggle, "bottom-right");
+
+            ////创建底图库并设置query
+            //var basemapGallery = new BasemapGallery({
+            //    view: view,
+            //    source: {
+            //        query: {
+            //            title: '"World Basemaps for Developers" AND owner:esri'
+            //        }
+            //    }
+            //});
+            //view.ui.add(basemapGallery, "bottom-right");
+
+            //位置跟踪
+            var track = new Track({
+                view: view,
+                graphic: new Graphic({
+                    symbol: {
+                        type: "simple-marker",
+                        size: "12px",
+                        color: "green",
+                        outline: {
+                            color: "#efefef",
+                            width: "1.5px"
+                        }
+                    }
+                }),
+                useHeadingEnabled: false
+            });
+            view.ui.add(track, "top-left");
+
+            //添加Home微键
+            Showhome();
+
+            function Showhome() {
+                var home = new Home({
+                    view: view,
+                });
+                view.ui.add(home, "top-left");
+            };
+
+            //指南针
+            ShowCompass();
+
+            function ShowCompass() {
+                var compass = new Compass({
+                    view: view
+                });
+                view.ui.add(compass, "top-left");
+            };
+
+            //比例尺
+            ShowScaleBar();
+
+            function ShowScaleBar() {
+                var scaleBar = new ScaleBar({
+                    style: "ruler",//line
+                    view: view,
+                    unit: "dual"//metric
+                });
+                view.ui.add(scaleBar, "bottom-left")
+            };
+
+            //经纬度
+            var ccwidget = new CoordinateConversion({
+                view: view
+            })
+            view.ui.add(ccwidget, "bottom-left");
+
+            //属性查图
+            var featureLayerRailway = new FeatureLayer({
+                url:
+                    "https://services6.arcgis.com/Y5PCFUErY5GS8xtY/arcgis/rest/services/%E5%B1%B1%E4%B8%9C%E7%9C%81%E9%AB%98%E9%93%81%E7%BA%BF%E8%B7%AF/FeatureServer/0",
+                popupTemplate: {
+                    // autocasts as new PopupTemplate()
+                    title: "线路名称：{线路名称}</br>起止站点：{起止站点}</br>开通日期：{开通日期}</br>线路长度：{线路长度}</br>运营速度：{运营速度}</br>沿线城市：{沿线城市}</br>{JS}",
+                    overwriteActions: true
+                }
+            });
+            var featureLayerStations = new FeatureLayer({
+                url: "https://services6.arcgis.com/Y5PCFUErY5GS8xtY/arcgis/rest/services/%E5%B1%B1%E4%B8%9C%E7%9C%81%E9%AB%98%E9%93%81%E7%AB%99%E7%82%B9/FeatureServer/0",
+                popupTemplate: {
+                    //autocasts as new PopupTemplate()
+                    title: "站点名称：{站点名称}</br>主要线路：{主要线路}</br>投用日期：{投用日期}</br>所属地区：{所属地区}</br>建筑面积：{建筑面积}</br>站台规模：{站台规模}</br>{JS}",
+                    overwriteActions: true
+                }
+            });
+            var searchWidget = new Search({
+                view: view,
+                allPlaceholder: "搜索线路或站点",
+                includeDefaultSources: false,
+                sources: [
+                    {
+                        layer: featureLayerRailway, searchFields: ["线路名称"],
+                        displayField: "线路名称",
+                        exactMatch: false,
+                        outFields: ["线路名称"],
+                        name: "线路名称",
+                        placeholder: "例如: 济青高速铁路"
+                    },
+                    {
+                        layer: featureLayerStations, searchFields: ["站点名称"],
+                        displayField: "站点名称",
+                        exactMatch: false,
+                        outFields: ["站点名称"],
+                        name: "站点名称",
+                        placeholder: "例如: 济南东站"
+                    }
+                ]
+            });
+            view.ui.add(searchWidget, "top-right");
+        });
+    </script>
+</head>
+<body>
+    <div class="bannerDiv">山东域内高铁信息GIS系统</div>
+    <div class="navigationDiv">
+        <div class="nav">
+            <ul>
+                <li><a href="Home.html">首页</a></li>
+                <li><a href="Map.html">地图浏览</a></li>
+                <li><a href="Search.html">地图查询</a></li>
+                <li><a href="Distance.html">距离量测</a></li>
+                <li><a href="Direction.html">方向路径</a></li>
+            </ul>
+        </div>
+    </div>
+    <div id="viewDiv"></div>
+</body>
+
+</html>
