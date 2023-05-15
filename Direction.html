@@ -52,6 +52,7 @@
         require([
             "esri/views/MapView",
             "esri/WebMap",
+            "esri/config",
             "esri/widgets/DistanceMeasurement2D",
             "esri/layers/FeatureLayer",
             "esri/widgets/Search",
@@ -66,6 +67,7 @@
         ], function (
             MapView,
             WebMap,
+            esriconfig,
             DistanceMeasurement2D,
             FeatureLayer,
             Search,
@@ -89,7 +91,7 @@
                 map: webmap,
                 container: "viewDiv"
             });
-
+            esriconfig.apiKey = "AAPK870974ca92eb4cfdb0c971cdcafb9995D_weylz_g6um2v38NxW7BFjNzBjF0tMQnvvX-0Ug_vPhtuC9AOnzfZthTpH0Bekk";
             //更改地图底图
             var basemapToggle = new BasemapToggle({
                 view: view,
